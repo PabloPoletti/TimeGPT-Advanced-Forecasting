@@ -31,6 +31,7 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 
 # Nixtla imports
+NIXTLA_AVAILABLE = False
 try:
     from nixtla import NixtlaClient
     from statsforecast import StatsForecast
@@ -41,9 +42,15 @@ try:
     from neuralforecast import NeuralForecast
     from neuralforecast.models import NBEATS, NHITS, TFT, TimesNet
     from neuralforecast.losses.pytorch import MAE, MSE, RMSE
+    NIXTLA_AVAILABLE = True
 except ImportError as e:
     print(f"Warning: Nixtla libraries not installed: {e}")
     print("Install with: pip install nixtla statsforecast neuralforecast")
+    # Create dummy classes
+    class AutoARIMA:
+        pass
+    class NBEATS:
+        pass
 
 warnings.filterwarnings('ignore')
 
@@ -181,6 +188,10 @@ class TimeGPTAnalysis:
     def train_statsforecast_models(self):
         """Train StatsForecast models with optimization"""
         print("\n🔧 Training StatsForecast Models...")
+        
+        if not NIXTLA_AVAILABLE:
+            print("⚠️ StatsForecast not available. Skipping StatsForecast training.")
+            return
         
         # Define models
         models = [
@@ -341,6 +352,10 @@ class TimeGPTAnalysis:
         """Comprehensive model evaluation"""
         print("\n📊 Evaluating model performance...")
         
+        if not self.predictions:
+            print("⚠️ No predictions available for evaluation")
+            return
+        
         results = []
         actual = self.test_data['y'].values
         
@@ -439,12 +454,12 @@ class TimeGPTAnalysis:
 {self.data[['y', 'returns', 'volatility']].describe().to_string()}
 
 ## 🏆 Model Performance Results
-{self.metrics.to_string(index=False)}
+        {pd.DataFrame(self.metrics).to_string(index=False) if self.metrics else 'No metrics available'}
 
 ## 🥇 Best Performing Model
-- **Model**: {self.metrics.iloc[0]['Model']}
-- **MAE**: {self.metrics.iloc[0]['MAE']:.4f}
-- **RMSE**: {self.metrics.iloc[0]['RMSE']:.4f}
+{f"- **Model**: {self.metrics.iloc[0]['Model']}" if self.metrics and isinstance(self.metrics, pd.DataFrame) and len(self.metrics) > 0 else "- No models available"}
+{f"- **MAE**: {self.metrics.iloc[0]['MAE']:.4f}" if self.metrics and isinstance(self.metrics, pd.DataFrame) and len(self.metrics) > 0 else ""}
+{f"- **RMSE**: {self.metrics.iloc[0]['RMSE']:.4f}" if self.metrics and isinstance(self.metrics, pd.DataFrame) and len(self.metrics) > 0 else ""}
 - **MAPE**: {self.metrics.iloc[0]['MAPE']:.2f}%
 
 ## ⚙️ Hyperparameter Optimization Results
