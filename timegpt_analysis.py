@@ -30,8 +30,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
 
-# Nixtla imports
-NIXTLA_AVAILABLE = False
+# Nixtla imports - REQUIRED for this analysis
 try:
     from nixtla import NixtlaClient
     from statsforecast import StatsForecast
@@ -42,15 +41,16 @@ try:
     from neuralforecast import NeuralForecast
     from neuralforecast.models import NBEATS, NHITS, TFT, TimesNet
     from neuralforecast.losses.pytorch import MAE, MSE, RMSE
-    NIXTLA_AVAILABLE = True
 except ImportError as e:
-    print(f"Warning: Nixtla libraries not installed: {e}")
-    print("Install with: pip install nixtla statsforecast neuralforecast")
-    # Create dummy classes
-    class AutoARIMA:
-        pass
-    class NBEATS:
-        pass
+    print("❌ CRITICAL ERROR: Required Nixtla libraries not installed!")
+    print(f"Missing: {e}")
+    print("\n🔧 INSTALLATION REQUIRED:")
+    print("pip install nixtla")
+    print("pip install statsforecast")
+    print("pip install neuralforecast")
+    print("\n📖 This project specifically demonstrates TimeGPT, StatsForecast, and NeuralForecast capabilities.")
+    print("Without these libraries, the analysis cannot proceed.")
+    exit(1)
 
 warnings.filterwarnings('ignore')
 
@@ -188,10 +188,6 @@ class TimeGPTAnalysis:
     def train_statsforecast_models(self):
         """Train StatsForecast models with optimization"""
         print("\n🔧 Training StatsForecast Models...")
-        
-        if not NIXTLA_AVAILABLE:
-            print("⚠️ StatsForecast not available. Skipping StatsForecast training.")
-            return
         
         # Define models
         models = [
