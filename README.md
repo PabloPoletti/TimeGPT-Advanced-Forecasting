@@ -25,10 +25,20 @@ Professional time series forecasting analysis using Nixtla's TimeGPT ecosystem. 
 
 ## 🛠️ Installation & Usage
 
-### Prerequisites
+### ⚠️ Required Libraries
+**This project specifically requires the Nixtla ecosystem to function properly:**
+
 ```bash
+# Core Nixtla libraries - REQUIRED
+pip install nixtla
+pip install statsforecast
+pip install neuralforecast
+
+# Or install all requirements
 pip install -r requirements.txt
 ```
+
+**Note:** Without these libraries, the analysis cannot proceed. The project will exit with clear installation instructions if dependencies are missing.
 
 ### Run Analysis
 ```bash
